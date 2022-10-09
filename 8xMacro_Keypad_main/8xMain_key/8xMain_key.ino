@@ -28,6 +28,7 @@
 #if NUM_BYTES > 255
 #error "NUM_BYTES can not be larger than 255."
 #endif
+#include "Key_config.h"
 
 __xdata uint8_t ledData[NUM_BYTES];
 
@@ -44,6 +45,7 @@ bool T_1 = false;
 bool T_2 = false;
 
 
+uint8_t Keyboardlevel = 0;
 #define BUTIN_1 11
 #define BUTIN_2 33
 #define BUTIN_3 16
@@ -93,156 +95,48 @@ void setup() {
 
 
 
-void Keypad(int inp) {
-  delay(10);
-  switch (inp) {
-    case 0:
-      Keyboard_press(KEY_HOME);             //Select Current line
-      Keyboard_releaseAll();
-      Keyboard_press(KEY_LEFT_SHIFT);
-      Keyboard_press(KEY_END);
-      Keyboard_releaseAll();
-      Keyboard_releaseAll();
-      Consumer_releaseAll();
-      delay(250);
-    case 1:
-      Keyboard_press(KEY_LEFT_CTRL);         //Copy
-      Keyboard_press('c');
-      Keyboard_releaseAll();
-      Consumer_releaseAll();
-      delay(250);
-      break;
-    case 2:
-      Keyboard_press(KEY_LEFT_CTRL);         //Paste
-      Keyboard_press('v');
-      Keyboard_releaseAll();
-      Consumer_releaseAll();
-      delay(250);
-      break;
-    case 3:
-      Consumer_press(MEDIA_PLAY_PAUSE);         //Play Pause
-      Keyboard_releaseAll();
-      Consumer_releaseAll();
-      delay(250);
-      break;
+void touch_routine() {
 
-    case 4:
-      Consumer_press(MEDIA_VOL_UP);         //Volume UP
+  TouchKey_Process();
+  uint8_t touchResult = TouchKey_Get();
 
-      Keyboard_releaseAll();
-      Consumer_releaseAll();
-      break;
+  if (touchResult & (1 << 2)) {
+    T_1 = true;
+    Keyboardlevel++;
+    if (Keyboardlevel > 1)Keyboardlevel = 0;
+    for (int c = 0; c < 7; c++) {
+      set_pixel_for_GRB_LED(ledData, c, 255, 0, 0);
+    }
+    neopixel_show_P3_4(ledData, NUM_BYTES); //Possible to use other pins.
+    delay(350);  // Pause for a moment
+    delay(1);
+  }
+  else {
 
-    case 5:
-      Consumer_press(MEDIA_VOL_DOWN);         //Volume DOWN
-      Keyboard_releaseAll();
-      Consumer_releaseAll();
-      break;
-    case 6:
-      Consumer_press(MEDIA_NEXT);         //Next
-      Keyboard_releaseAll();
-      Consumer_releaseAll();
-      delay(250);
-      break;
-    case 7:
-      Consumer_press(MEDIA_PREVIOUS);         //Previous
-      Keyboard_releaseAll();
-      Consumer_releaseAll();
-      delay(250);
-      break;
-
-    case 8:
-      Keyboard_press(KEY_HOME);             //Select Current line
-      Keyboard_releaseAll();
-      Keyboard_press(KEY_LEFT_SHIFT);
-      Keyboard_press(KEY_END);
-      Keyboard_releaseAll();
-      Keyboard_releaseAll();
-      Consumer_releaseAll();
-      delay(250);
-      break;
-    case 9:
-      Keyboard_press(KEY_LEFT_CTRL);             //Build Current
-      Keyboard_press(KEY_LEFT_SHIFT);
-      Keyboard_press('b');
-      Keyboard_releaseAll();
-      Keyboard_press(KEY_LEFT_CTRL);
-      Keyboard_press('u');
-
-      //Youtube
-      //            Keyboard_press(KEY_LEFT_CTRL);
-      //            Keyboard_press(KEY_LEFT_ALT);
-      //            Keyboard_press('u');
-      //            delay(4000);
-      //            Keyboard_releaseAll();
-      //            Keyboard_write('Y');
-      //            Keyboard_press(KEY_LEFT_ALT);
-      //            Keyboard_press( KEY_LEFT_ARROW);
-      //            Keyboard_press( KEY_RETURN);
-      Keyboard_releaseAll();
-      Keyboard_releaseAll();
-      Consumer_releaseAll();
-      break;
-    case 10:
-      Consumer_press(MEDIA_PREVIOUS);
-      Keyboard_releaseAll();
-      Consumer_releaseAll();
-      break;
-    default:
-      //Select Current line
-      Keyboard_releaseAll();
-      Consumer_releaseAll();
-      break;
+    T_1 = false;
+    delay(1);
 
   }
 
+  if (touchResult & (1 << 3)) {
 
-}
+    T_2 = true;
 
-void touch_routine() {
-  /*
-    TouchKey_Process();
-    uint8_t touchResult = TouchKey_Get();
-
-    if (touchResult & (1 << 2)) {
-      T_1 = true;
-      delay(1);
+    for (int c = 0; c < 7; c++) {
+      set_pixel_for_GRB_LED(ledData, c, 0, 255, 0);
     }
-    else {
+    neopixel_show_P3_4(ledData, NUM_BYTES); //Possible to use other pins.
+    delay(350);  // Pause for a moment
+    Keyboardlevel--;
+    if (Keyboardlevel < 0)Keyboardlevel = 0;
+    delay(1);
+  }
+  else {
+    T_2 = false;
+    delay(1);
 
-      T_1 = false;
-      delay(1);
+  }
 
-    } if (touchResult & (1 << 3)) {
-
-      T_2 = true;
-      delay(1);
-    }
-    else {
-      T_2 = false;
-      delay(1);
-
-    } if (touchResult & (1 << 4)) {
-
-      T_3 = true;
-      delay(1);
-    }
-    else {
-      T_3 = false;
-      delay(1);
-
-    } if (touchResult & (1 << 5)) {
-      T_4 = true;
-      delay(1);
-
-    }
-    else {
-      T_4 = false;
-      delay(1);
-
-    }
-
-  */
 }
 
 void Button_Routine() {
@@ -255,15 +149,32 @@ void Button_Routine() {
   if (digitalRead(BUTIN_1) != HIGH) {
     delay(25);
     if (digitalRead(BUTIN_1) != HIGH) {
-      Keypad(3);
-      //    while (digitalRead(BUTIN_1) != HIGH)delay(100);
+      if (Keyboardlevel == 0) {
+        Keypad(3);
+      }
+      else if (Keyboardlevel == 1) {
+
+        Keypad1(3);
+      }
+      else {
+        Keyboardlevel = 0;
+      }
     }
   }
 
   else if (digitalRead(BUTIN_2) != HIGH) {
     delay(25);
     if (digitalRead(BUTIN_2) != HIGH) {
-      Keypad(2);
+      if (Keyboardlevel == 0) {
+        Keypad(2);
+      }
+      else if (Keyboardlevel == 1) {
+
+        Keypad1(2);
+      }
+      else {
+        Keyboardlevel = 0;
+      }
       //while (digitalRead(BUTIN_2) != HIGH)delay(100);
     }
   }
@@ -271,8 +182,16 @@ void Button_Routine() {
   else if (digitalRead(BUTIN_3) != HIGH) {
     delay(25);
     if (digitalRead(BUTIN_3) != HIGH) {
-      Keypad(6);
-      //     while (digitalRead(BUTIN_3) != HIGH)delay(100);
+      if (Keyboardlevel == 0) {
+        Keypad(6);
+      }
+      else if (Keyboardlevel == 1) {
+
+        Keypad1(6);
+      }
+      else {
+        Keyboardlevel = 0;
+      }
     }
   }
   ///***************end of 1 column
@@ -286,24 +205,48 @@ void Button_Routine() {
   if (digitalRead(BUTIN_1) != HIGH) {
     delay(25);
     if (digitalRead(BUTIN_1) != HIGH) {
-      Keypad(5);
-      //    while (digitalRead(BUTIN_1) != HIGH)delay(100);
+      if (Keyboardlevel == 0) {
+        Keypad(5);
+      }
+      else if (Keyboardlevel == 1) {
+
+        Keypad1(5);
+      }
+      else {
+        Keyboardlevel = 0;
+      }
     }
   }
 
   else  if (digitalRead(BUTIN_2) != HIGH) {
     delay(25);
     if (digitalRead(BUTIN_2) != HIGH) {
-      Keypad(4);
-      //    while (digitalRead(BUTIN_2) != HIGH)delay(100);
+      if (Keyboardlevel == 0) {
+        Keypad(4);
+      }
+      else if (Keyboardlevel == 1) {
+
+        Keypad1(4);
+      }
+      else {
+        Keyboardlevel = 0;
+      }
     }
   }
 
   else  if (digitalRead(BUTIN_3) != HIGH) {
     delay(25);
     if (digitalRead(BUTIN_3) != HIGH) {
-      Keypad(7);
-      //   while (digitalRead(BUTIN_3) != HIGH)delay(100);
+      if (Keyboardlevel == 0) {
+        Keypad(7);
+      }
+      else if (Keyboardlevel == 1) {
+
+        Keypad1(7);
+      }
+      else {
+        Keyboardlevel = 0;
+      }
     }
   }
   ///***************end of 2 column
@@ -317,15 +260,32 @@ void Button_Routine() {
   if (digitalRead(BUTIN_1) != HIGH) {
     delay(25);
     if (digitalRead(BUTIN_1) != HIGH) {
-      Keypad(0);
-      //   while (digitalRead(BUTIN_1) != HIGH)delay(100);
+      if (Keyboardlevel == 0) {
+        Keypad(0);
+      }
+      else if (Keyboardlevel == 1) {
+
+        Keypad1(0);
+      }
+      else {
+        Keyboardlevel = 0;
+      }
     }
   }
 
   else  if (digitalRead(BUTIN_2) != HIGH) {
     delay(25);
     if (digitalRead(BUTIN_2) != HIGH) {
-      Keypad(1);
+      if (Keyboardlevel == 0) {
+        Keypad(1);
+      }
+      else if (Keyboardlevel == 1) {
+
+        Keypad1(1);
+      }
+      else {
+        Keyboardlevel = 0;
+      }
       //  while (digitalRead(BUTIN_2) != HIGH)delay(100);
     }
   }
