@@ -1,4 +1,4 @@
-#Macro Keyboard
+# Macro Keyboard
 
 This project was build to provide a convinent way to control some basic task while working. Also this was a way for me to explore CH551G a wonderfull IC with so much potential.
 Although the code is still a bit messy but it does what it is supposed to do.
@@ -10,7 +10,7 @@ I had a CNC milling machine lying around so I made a simple PCB with lowest poss
 PCB Files are located inside `Macro Mini Keypad PCB Files`
 and Source code is in `8xMacro_Keypad_main/8xMain_key`
 
-##Code
+## Code
 
 Before programming the CH551G please follow [this guide](https://github.com/DeqingSun/ch55xduino "this guide") .
 
@@ -19,14 +19,14 @@ Once the Arduino is configured to compile code for ch551G go to `tools > User se
 Now you can compile and upload the code in the Board via USB just remember to keep pressed the mini button behind the USB connetor while connecting the USB cable.
 
 
-###Touch Switch config
+### Touch Switch config
 
 There are 2 touch switch that need to be wired externally which can change the keyboard modes. 
 For initial code it only change the copy paste command as in Linux terminal normal `ctrl + c `doesnt work but `ctrl + shift + c ` work.
 
 in the 3D file behind the arrows a simple copper tap can be stuck and using wire can be connected to the pin 2 and 3 of the CH551G to change mode UP and Down.
 
-###Changing the Keypress
+### Changing the Keypress
 
 Keypress can be changed in the attached Key_config.h file .
 just replace the segment inside the function `Keyboard_press(   );` with what ever keypress you want to perform.
