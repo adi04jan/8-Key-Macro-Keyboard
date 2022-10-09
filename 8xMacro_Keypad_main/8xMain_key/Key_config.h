@@ -16,14 +16,14 @@ void Keypad(int inp) {
       Keyboard_press('c');
       Keyboard_releaseAll();
       Consumer_releaseAll();
-      delay(250);
+      delay(150);
       break;
     case 2:
       Keyboard_press(KEY_LEFT_CTRL);         //Paste
       Keyboard_press('v');
       Keyboard_releaseAll();
       Consumer_releaseAll();
-      delay(250);
+      delay(150);
       break;
     case 3:
       Consumer_press(MEDIA_PLAY_PAUSE);         //Play Pause
@@ -122,7 +122,7 @@ void Keypad1(int inp) {
       Keyboard_press('c');
       Keyboard_releaseAll();
       Consumer_releaseAll();
-      delay(250);
+      delay(150);
       break;
     case 2:
       Keyboard_press(KEY_LEFT_CTRL);         //Paste
@@ -130,7 +130,7 @@ void Keypad1(int inp) {
       Keyboard_press('v');
       Keyboard_releaseAll();
       Consumer_releaseAll();
-      delay(250);
+      delay(150);
       break;
     case 3:
       Consumer_press(MEDIA_PLAY_PAUSE);         //Play Pause
